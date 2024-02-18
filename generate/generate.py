@@ -1,4 +1,4 @@
-from utils import check_novelty, sample, canonic_smiles
+from utils import check_novelty, sample, canonic_smiles, Device
 from dataset import SmileDataset
 from rdkit.Chem import QED
 from rdkit.Chem import Crippen
@@ -44,7 +44,7 @@ if __name__ == '__main__':
         parser.add_argument('--gen_size', type=int, default = 10000, help="number of times to generate from a batch", required=False)
         parser.add_argument('--vocab_size', type=int, default = 26, help="number of layers", required=False)  # previously 28 .... 26 for moses. 94 for guacamol
         parser.add_argument('--block_size', type=int, default = 54, help="number of layers", required=False)   # previously 57... 54 for moses. 100 for guacamol.
-        # parser.add_argument('--num_props', type=int, default = 0, help="number of properties to use for condition", required=False)
+        parser.add_argument('--num_props', type=int, default = 0, help="number of properties to use for condition", required=False)
         parser.add_argument('--props', nargs="+", default = [], help="properties to be used for condition", required=False)
         parser.add_argument('--n_layer', type=int, default = 8, help="number of layers", required=False)
         parser.add_argument('--n_head', type=int, default = 8, help="number of heads", required=False)
@@ -52,12 +52,13 @@ if __name__ == '__main__':
         parser.add_argument('--lstm_layers', type=int, default = 2, help="number of layers in lstm", required=False)
 
         args = parser.parse_args()
-
+        print(args)
 
         context = "C"
 
-
-        data = pd.read_csv(args.data_name + '.csv')
+        device = Device().getDevice()
+        
+        data = pd.read_csv('datasets/' + args.data_name + '.csv')
         data = data.dropna(axis=0).reset_index(drop=True)
         data.columns = data.columns.str.lower()
 
@@ -117,7 +118,8 @@ if __name__ == '__main__':
         # condition = ['c1ccc(-n2cnc3ccccc32)cc1', 'O=C(c1cc[nH]c1)N1CCN(c2ccccc2)CC1']   # 'O=C(CNC(=O)NCCN1CCOCC1)Nc1ccccc1'
         #condition = [ i + str('<')*(scaffold_max_len - len(regex.findall(i))) for i in condition]
         #print(condition)
-
+        
+        
         num_props = len(args.props)
         mconf = GPTConfig(args.vocab_size, args.block_size, num_props = num_props,
                        n_layer=args.n_layer, n_head=args.n_head, n_embd=args.n_embd, scaffold = args.scaffold, scaffold_maxlen = scaffold_max_len,
@@ -125,8 +127,8 @@ if __name__ == '__main__':
         model = GPT(mconf)
 
 
-        model.load_state_dict(torch.load(args.model_weight))
-        model.to('cuda')
+        model.load_state_dict(torch.load(f'../cond_gpt/weights/{args.model_weight}.pt'))
+        model.to(device)
         print('Model loaded')
 
         gen_iter = math.ceil(args.gen_size / args.batch_size)
@@ -184,11 +186,11 @@ if __name__ == '__main__':
             molecules = []
             count += 1
             for i in tqdm(range(gen_iter)):
-                    x = torch.tensor([stoi[s] for s in regex.findall(context)], dtype=torch.long)[None,...].repeat(args.batch_size, 1).to('cuda')
+                    x = torch.tensor([stoi[s] for s in regex.findall(context)], dtype=torch.long)[None,...].repeat(args.batch_size, 1).to(device)
                     p = None
-                    # p = torch.tensor([[c]]).repeat(args.batch_size, 1).to('cuda')   # for single condition
-                    # p = torch.tensor([c]).repeat(args.batch_size, 1).unsqueeze(1).to('cuda')    # for multiple conditions
-                    #sca = torch.tensor([stoi[s] for s in regex.findall(j)], dtype=torch.long)[None,...].repeat(args.batch_size, 1).to('cuda')
+                    # p = torch.tensor([[c]]).repeat(args.batch_size, 1).to(device)   # for single condition
+                    # p = torch.tensor([c]).repeat(args.batch_size, 1).unsqueeze(1).to(device)    # for multiple conditions
+                    #sca = torch.tensor([stoi[s] for s in regex.findall(j)], dtype=torch.long)[None,...].repeat(args.batch_size, 1).to(device)
                     sca = None
                     y = sample(model, x, args.block_size, temperature=1, sample=True, top_k=None, prop = p, scaffold = sca)   # 0.7 for guacamol
                     for gen_mol in y:
@@ -248,12 +250,12 @@ if __name__ == '__main__':
                 molecules = []
                 count += 1
                 for i in tqdm(range(gen_iter)):
-                        x = torch.tensor([stoi[s] for s in regex.findall(context)], dtype=torch.long)[None,...].repeat(args.batch_size, 1).to('cuda')
+                        x = torch.tensor([stoi[s] for s in regex.findall(context)], dtype=torch.long)[None,...].repeat(args.batch_size, 1).to(device)
                         p = None
                         if len(args.props) == 1:
-                                p = torch.tensor([[c]]).repeat(args.batch_size, 1).to('cuda')   # for single condition
+                                p = torch.tensor([[c]]).repeat(args.batch_size, 1).to(device)   # for single condition
                         else:
-                                p = torch.tensor([c]).repeat(args.batch_size, 1).unsqueeze(1).to('cuda')    # for multiple conditions
+                                p = torch.tensor([c]).repeat(args.batch_size, 1).unsqueeze(1).to(device)    # for multiple conditions
                         sca = None
                         y = sample(model, x, args.block_size, temperature=1, sample=True, top_k=None, prop = p, scaffold = sca)   # 0.7 for guacamol
                         for gen_mol in y:
@@ -321,9 +323,9 @@ if __name__ == '__main__':
                 molecules = []
                 count += 1
                 for i in tqdm(range(gen_iter)):
-                    x = torch.tensor([stoi[s] for s in regex.findall(context)], dtype=torch.long)[None,...].repeat(args.batch_size, 1).to('cuda')
+                    x = torch.tensor([stoi[s] for s in regex.findall(context)], dtype=torch.long)[None,...].repeat(args.batch_size, 1).to(device)
                     p = None
-                    sca = torch.tensor([stoi[s] for s in regex.findall(j)], dtype=torch.long)[None,...].repeat(args.batch_size, 1).to('cuda')
+                    sca = torch.tensor([stoi[s] for s in regex.findall(j)], dtype=torch.long)[None,...].repeat(args.batch_size, 1).to(device)
                     y = sample(model, x, args.block_size, temperature=1, sample=True, top_k=None, prop = p, scaffold = sca)   # 0.7 for guacamol
                     for gen_mol in y:
                             completion = ''.join([itos[int(i)] for i in gen_mol])
@@ -387,13 +389,13 @@ if __name__ == '__main__':
                     molecules = []
                     count += 1
                     for i in tqdm(range(gen_iter)):
-                        x = torch.tensor([stoi[s] for s in regex.findall(context)], dtype=torch.long)[None,...].repeat(args.batch_size, 1).to('cuda')
+                        x = torch.tensor([stoi[s] for s in regex.findall(context)], dtype=torch.long)[None,...].repeat(args.batch_size, 1).to(device)
                         p = None
                         if len(args.props) == 1:
-                                p = torch.tensor([[c]]).repeat(args.batch_size, 1).to('cuda')   # for single condition
+                                p = torch.tensor([[c]]).repeat(args.batch_size, 1).to(device)   # for single condition
                         else:
-                                p = torch.tensor([c]).repeat(args.batch_size, 1).unsqueeze(1).to('cuda')    # for multiple conditions
-                        sca = torch.tensor([stoi[s] for s in regex.findall(j)], dtype=torch.long)[None,...].repeat(args.batch_size, 1).to('cuda')
+                                p = torch.tensor([c]).repeat(args.batch_size, 1).unsqueeze(1).to(device)    # for multiple conditions
+                        sca = torch.tensor([stoi[s] for s in regex.findall(j)], dtype=torch.long)[None,...].repeat(args.batch_size, 1).to(device)
                         y = sample(model, x, args.block_size, temperature=1, sample=True, top_k=None, prop = p, scaffold = sca)   # 0.7 for guacamol
                         for gen_mol in y:
                                 completion = ''.join([itos[int(i)] for i in gen_mol])
