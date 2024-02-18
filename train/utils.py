@@ -273,3 +273,18 @@ class SmilesEnumerator(object):
             smile = "".join(self._int_to_char[i] for i in v.argmax(axis=1))
             smiles.append(smile)
         return np.array(smiles)
+    
+    
+# Select the appropriate accelator device: CUDA/MPS GPU or CPU
+class Device:
+    def __init__(self):
+        self.device = (
+            "cuda"
+            if torch.cuda.is_available()
+            else "mps"
+            if torch.backends.mps.is_available()
+            else "cpu"
+        )
+        
+    def getDevice(self):
+        return self.device

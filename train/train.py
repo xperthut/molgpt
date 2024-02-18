@@ -2,7 +2,7 @@ import pandas as pd
 import argparse
 from utils import set_seed
 import numpy as np
-import wandb
+#import wandb
 
 import torch
 import torch.nn as nn
@@ -10,12 +10,15 @@ from torch.utils.data import DataLoader
 from torch.nn import functional as F
 from torch.cuda.amp import GradScaler
 
+
 from model import GPT, GPTConfig
 from trainer import Trainer, TrainerConfig
 from dataset import SmileDataset
 import math
 from utils import SmilesEnumerator
 import re
+
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
@@ -48,14 +51,18 @@ if __name__ == '__main__':
                         help="batch size", required=False)
     parser.add_argument('--learning_rate', type=int,
                         default=6e-4, help="learning rate", required=False)
-    parser.add_argument('--lstm_layers', type=int, default=0,
+    parser.add_argument('--lstm_layers', type=int, default=2,
                         help="number of layers in lstm", required=False)
+    parser.add_argument('--generate', type=bool, default=False, action=argparse.BooleanOptionalAction,
+                        help="Generate data during training", required=False)
 
     args = parser.parse_args()
+    
+    print(args)
 
     set_seed(42)
 
-    wandb.init(project="lig_gpt", name=args.run_name)
+    #wandb.init(project="lig_gpt", name=args.run_name)
 
     data = pd.read_csv('datasets/' + args.data_name + '.csv')
     data = data.dropna(axis=0).reset_index(drop=True)
@@ -85,7 +92,8 @@ if __name__ == '__main__':
 
     # prop = train_data[['qed']]
     # vprop = val_data[['qed']]
-
+    
+    generate_data = args.generate
     prop = train_data[args.props].values.tolist()
     vprop = val_data[args.props].values.tolist()
     num_props = args.num_props
@@ -122,19 +130,28 @@ if __name__ == '__main__':
 
     whole_string = ['#', '%10', '%11', '%12', '(', ')', '-', '1', '2', '3', '4', '5', '6', '7', '8', '9', '<', '=', 'B', 'Br', 'C', 'Cl', 'F', 'I', 'N', 'O', 'P', 'S', '[B-]', '[BH-]', '[BH2-]', '[BH3-]', '[B]', '[C+]', '[C-]', '[CH+]', '[CH-]', '[CH2+]', '[CH2]', '[CH]', '[F+]', '[H]', '[I+]', '[IH2]', '[IH]', '[N+]', '[N-]', '[NH+]', '[NH-]', '[NH2+]', '[NH3+]', '[N]', '[O+]', '[O-]', '[OH+]', '[O]', '[P+]', '[PH+]', '[PH2+]', '[PH]', '[S+]', '[S-]', '[SH+]', '[SH]', '[Se+]', '[SeH+]', '[SeH]', '[Se]', '[Si-]', '[SiH-]', '[SiH2]', '[SiH]', '[Si]', '[b-]', '[bH-]', '[c+]', '[c-]', '[cH+]', '[cH-]', '[n+]', '[n-]', '[nH+]', '[nH]', '[o+]', '[s+]', '[sH+]', '[se+]', '[se]', 'b', 'c', 'n', 'o', 'p', 's']
 
-    train_dataset = SmileDataset(args, smiles, whole_string, max_len, prop=prop, aug_prob=0, scaffold=scaffold, scaffold_maxlen= scaffold_max_len)
-    valid_dataset = SmileDataset(args, vsmiles, whole_string, max_len, prop=vprop, aug_prob=0, scaffold=vscaffold, scaffold_maxlen= scaffold_max_len)
+    train_dataset = SmileDataset(args, smiles, whole_string, max_len, prop=prop, 
+                                 aug_prob=0, scaffold=scaffold, scaffold_maxlen= scaffold_max_len)
+    valid_dataset = SmileDataset(args, vsmiles, whole_string, max_len, prop=vprop, 
+                                 aug_prob=0, scaffold=vscaffold, scaffold_maxlen= scaffold_max_len)
 
     mconf = GPTConfig(train_dataset.vocab_size, train_dataset.max_len, num_props=num_props,  # args.num_props,
-                        n_layer=args.n_layer, n_head=args.n_head, n_embd=args.n_embd, scaffold=args.scaffold, scaffold_maxlen=scaffold_max_len,
-                        lstm=args.lstm, lstm_layers=args.lstm_layers)
+                      n_layer=args.n_layer, n_head=args.n_head, n_embd=args.n_embd, scaffold=args.scaffold,
+                      scaffold_maxlen=scaffold_max_len, lstm=args.lstm, lstm_layers=args.lstm_layers)
     model = GPT(mconf)
 
-    tconf = TrainerConfig(max_epochs=args.max_epochs, batch_size=args.batch_size, learning_rate=args.learning_rate,
-                            lr_decay=True, warmup_tokens=0.1*len(train_data)*max_len, final_tokens=args.max_epochs*len(train_data)*max_len,
-                            num_workers=10, ckpt_path=f'../cond_gpt/weights/{args.run_name}.pt', block_size=train_dataset.max_len, generate=False)
+    tconf = TrainerConfig(max_epochs=args.max_epochs, batch_size=args.batch_size, 
+                          learning_rate=args.learning_rate,
+                          lr_decay=True, 
+                          warmup_tokens=0.1*len(train_data)*max_len,
+                          final_tokens=args.max_epochs*len(train_data)*max_len,
+                          num_workers=10, 
+                          ckpt_path=f'../cond_gpt/weights/{args.run_name}.pt', 
+                          block_size=train_dataset.max_len, generate=generate_data)
+    
     trainer = Trainer(model, train_dataset, valid_dataset,
                         tconf, train_dataset.stoi, train_dataset.itos)
-    df = trainer.train(wandb)
+    df = trainer.train(None)
 
-    df.to_csv(f'{args.run_name}.csv', index=False)
+    if generate_data:
+        df.to_csv(f'{args.run_name}.csv', index=False)

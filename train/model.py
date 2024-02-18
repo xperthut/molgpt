@@ -25,7 +25,9 @@ class GPTConfig:
     def __init__(self, vocab_size, block_size, **kwargs):
         self.vocab_size = vocab_size
         self.block_size = block_size
+        print('GPT configuration')
         for k,v in kwargs.items():
+            print(f"{k}={v}")
             setattr(self, k, v)
 
 class GPT1Config(GPTConfig):

@@ -15,7 +15,7 @@ from torch.optim.lr_scheduler import LambdaLR
 from torch.utils.data.dataloader import DataLoader
 from torch.cuda.amp import GradScaler
 
-from utils import check_novelty, sample, canonic_smiles
+from utils import check_novelty, sample, canonic_smiles, Device
 from moses.utils import get_mol
 import re
 import pandas as pd
@@ -41,7 +41,9 @@ class TrainerConfig:
     num_workers = 0 # for DataLoader
 
     def __init__(self, **kwargs):
+        print('Trainer configuration')
         for k,v in kwargs.items():
+            print(f"{k}={v}")
             setattr(self, k, v)
 
 class Trainer:
@@ -53,14 +55,14 @@ class Trainer:
         self.config = config
 
         # take over whatever gpus are on the system
-        self.device = 'cpu'
+        self.device = Device().getDevice()
         self.stoi = stoi
         self.itos = itos
 
-        if torch.cuda.is_available():
-            self.device = torch.cuda.current_device()
-            # self.model = torch.nn.DataParallel(self.model).to(self.device)
-            self.model = self.model.to(self.device)
+        #if torch.cuda.is_available():
+        self.device = Device().getDevice() #torch.cuda.current_device()
+        # self.model = torch.nn.DataParallel(self.model).to(self.device)
+        self.model = self.model.to(self.device)
 
     def save_checkpoint(self):
         # DataParallel wrappers keep raw model object in .module attribute
@@ -98,6 +100,7 @@ class Trainer:
 
                 # forward the model
                 with torch.cuda.amp.autocast():
+                #with torch.autocast(self.device, dtype=torch.float16):
                     with torch.set_grad_enabled(is_train):
                         logits, loss, _ = model(x, y, p, scaffold)
                         loss = loss.mean() # collapse all losses if they are scattered on multiple gpus
@@ -130,7 +133,8 @@ class Trainer:
                         lr = config.learning_rate
 
                     # report progress
-                    wandb.log({'step_train_loss': loss, 'train_step': it + epoch*len(loader), 'learning_rate': lr})
+                    if wandb:
+                        wandb.log({'step_train_loss': loss, 'train_step': it + epoch*len(loader), 'learning_rate': lr})
                     pbar.set_description(f"epoch {epoch+1} iter {it}: train loss {loss.item():.5f}. lr {lr:e}")
     
             if is_train:
@@ -151,7 +155,8 @@ class Trainer:
             if self.test_dataset is not None:
                 test_loss = run_epoch('test')
 
-            wandb.log({'epoch_valid_loss': test_loss, 'epoch_train_loss': train_loss, 'epoch': epoch + 1})
+            if wandb:
+                wandb.log({'epoch_valid_loss': test_loss, 'epoch_train_loss': train_loss, 'epoch': epoch + 1})
 
             # supports early stopping based on the test loss, or just save always if no test set is provided
             good_model = self.test_dataset is None or test_loss < best_loss
@@ -165,7 +170,7 @@ class Trainer:
                 regex = re.compile(pattern)
                 context = "C"
                 for i in range(2):
-                    x = torch.tensor([self.stoi[s] for s in regex.findall(context)], dtype=torch.long)[None,...].repeat(512, 1).to('cuda')
+                    x = torch.tensor([self.stoi[s] for s in regex.findall(context)], dtype=torch.long)[None,...].repeat(512, 1).to(self.device)
                     p = None
                     sca = None
                     y = sample(model, x, self.config.block_size, temperature=0.8, sample=True, top_k=10, prop = p, scaffold = sca)
