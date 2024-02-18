@@ -1,0 +1,7 @@
+conda deactivate
+conda activate torch
+pip install --upgrade wandb
+pip install --upgrade rdkit
+
+## Download moses from git and install manually after activating conda
+python setup.py install
