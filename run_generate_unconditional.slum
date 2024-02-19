@@ -8,4 +8,4 @@ source "$CONDA_BASE_DIR/etc/profile.d/conda.sh"
 
 source activate Torch-CUDA-11
 
-python generate/generate.py --model_weight unconditional_moses --csv_name generated_unconditional_moses --data_name moses2 --batch_size 384 -gen_size 50 --vocab_size 94 --block_size 54
+python generate/generate.py --model_weight unconditional_moses --csv_name generated_unconditional_moses --data_name moses2 --batch_size 384 --gen_size 50 --vocab_size 94 --block_size 54
