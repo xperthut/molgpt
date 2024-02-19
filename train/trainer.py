@@ -67,7 +67,10 @@ class Trainer:
 
     def save_checkpoint(self):
         # DataParallel wrappers keep raw model object in .module attribute
-        print(f"Model has module={hasattr(self.model, "module")}")
+        if hasattr(self.model, "module"):
+            print(f"Model has module")
+        else:
+            print(f"Model does not have module")
         raw_model = self.model.module if hasattr(self.model, "module") else self.model
         logger.info("saving %s", self.config.ckpt_path)
         print(f"State dictionary={raw_model.state_dict()}")
