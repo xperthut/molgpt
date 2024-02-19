@@ -122,8 +122,9 @@ if __name__ == '__main__':
         
         num_props = len(args.props)
         mconf = GPTConfig(args.vocab_size, args.block_size, num_props = num_props,
-                       n_layer=args.n_layer, n_head=args.n_head, n_embd=args.n_embd, scaffold = args.scaffold, scaffold_maxlen = scaffold_max_len,
-                       lstm = args.lstm, lstm_layers = args.lstm_layers)
+                          n_layer=args.n_layer, n_head=args.n_head, n_embd=args.n_embd, 
+                          scaffold = args.scaffold, scaffold_maxlen = scaffold_max_len,
+                          lstm = args.lstm, lstm_layers = args.lstm_layers)
         model = GPT(mconf)
 
 
