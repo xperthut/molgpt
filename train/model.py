@@ -23,9 +23,11 @@ class GPTConfig:
     attn_pdrop = 0.1
 
     def __init__(self, vocab_size, block_size, **kwargs):
+        print('GPT configuration')
         self.vocab_size = vocab_size
         self.block_size = block_size
-        print('GPT configuration')
+        print(f"vocab_size={vocab_size}")
+        print(f"block_size={block_size}")
         for k,v in kwargs.items():
             print(f"{k}={v}")
             setattr(self, k, v)

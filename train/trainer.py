@@ -56,6 +56,7 @@ class Trainer:
 
         # take over whatever gpus are on the system
         self.device = Device().getDevice()
+        print(f"Device={self.device}")
         self.stoi = stoi
         self.itos = itos
 
