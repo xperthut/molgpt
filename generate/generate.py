@@ -127,7 +127,10 @@ if __name__ == '__main__':
                           lstm = args.lstm, lstm_layers = args.lstm_layers)
         model = GPT(mconf)
 
-
+        print("*************************")
+        print(model)
+        print("*************************")
+    
         model.load_state_dict(torch.load(f'../cond_gpt/weights/{args.model_weight}.pt'))
         model.to(device)
         print('Model loaded')

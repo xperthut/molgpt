@@ -139,6 +139,9 @@ if __name__ == '__main__':
                       n_layer=args.n_layer, n_head=args.n_head, n_embd=args.n_embd, scaffold=args.scaffold,
                       scaffold_maxlen=scaffold_max_len, lstm=args.lstm, lstm_layers=args.lstm_layers)
     model = GPT(mconf)
+    print("*************************")
+    print(model)
+    print("*************************")
 
     tconf = TrainerConfig(max_epochs=args.max_epochs, batch_size=args.batch_size, 
                           learning_rate=args.learning_rate,
