@@ -92,7 +92,7 @@ if __name__ == '__main__':
         #scaffold_max_len = max(lens)
         
         #scaf = [ i + str('<')*(scaffold_max_len - len(regex.findall(i))) for i in scaf]
-        if ('moses' in args.data_name) and args.scaffold:
+        if ('moses' in args.data_name): # and args.scaffold:
             scaffold_max_len=48
         elif ('guacamol' in args.data_name) and args.scaffold:
             scaffold_max_len = 98
