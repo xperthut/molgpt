@@ -128,7 +128,10 @@ if __name__ == '__main__':
         model = GPT(mconf)
 
         print("*************************")
-        print(model)
+        print(args.vocab_size, args.block_size, num_props,
+              args.n_layer, args.n_head, args.n_embd, 
+              args.scaffold, scaffold_max_len,
+              args.lstm, args.lstm_layers)
         print("*************************")
         
         pt_file = f'../cond_gpt/weights/{args.model_weight}.pt'
