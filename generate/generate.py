@@ -130,8 +130,15 @@ if __name__ == '__main__':
         print("*************************")
         print(model)
         print("*************************")
-    
-        model.load_state_dict(torch.load(f'../cond_gpt/weights/{args.model_weight}.pt'))
+        
+        pt_file = f'../cond_gpt/weights/{args.model_weight}.pt'
+        print(f"saved weight file={pt_file}")
+        if os.path.exists(pt_file):
+            print(f"{pt_file} exists")
+        else:
+            print(f"{pt_file} missing")
+        
+        model.load_state_dict(torch.load(pt_file))
         model.to(device)
         print('Model loaded')
 
