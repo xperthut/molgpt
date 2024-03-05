@@ -103,9 +103,10 @@ if __name__ == '__main__':
         #chars = sorted(list(set(regex.findall(content))))
 
         #stoi = { ch:i for i,ch in enumerate(chars) }
-
-        #with open(f'{args.data_name}_stoi.json', 'w') as f:
-        #         json.dump(stoi, f)
+        
+        if not os.path.exists(f'{args.data_name}_stoi.json'):
+            with open(f'{args.data_name}_stoi.json', 'w') as f:
+                 json.dump(stoi, f)
 
         stoi = json.load(open(f'{args.data_name}_stoi.json', 'r'))
 
