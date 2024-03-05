@@ -84,6 +84,7 @@ if __name__ == '__main__':
 
         pattern =  "(\[[^\]]+]|<|Br?|Cl?|N|O|S|P|F|I|b|c|n|o|s|p|\(|\)|\.|=|#|-|\+|\\\\|\/|:|~|@|\?|>|\*|\$|\%[0-9]{2}|[0-9])"
         regex = re.compile(pattern)
+        
         #lens = [len(regex.findall(i)) for i in smiles]
         #max_len = max(lens)
         #smiles = [ i + str('<')*(max_len - len(regex.findall(i))) for i in smiles]
@@ -99,12 +100,17 @@ if __name__ == '__main__':
         else:
             scaffold_max_len = 0
 
-        #content = ' '.join(smiles + scaf)
-        #chars = sorted(list(set(regex.findall(content))))
+        content = ' '.join(smiles + scaf)
+        chars = sorted(list(set(regex.findall(content))))
 
-        #stoi = { ch:i for i,ch in enumerate(chars) }
+        stoi = { ch:i for i,ch in enumerate(chars) }
         
         if not os.path.exists(f'{args.data_name}_stoi.json'):
+            content = ' '.join(smiles + scaf)
+            chars = sorted(list(set(regex.findall(content))))
+
+            stoi = { ch:i for i,ch in enumerate(chars) }
+        
             with open(f'{args.data_name}_stoi.json', 'w') as f:
                  json.dump(stoi, f)
 
