@@ -99,17 +99,14 @@ if __name__ == '__main__':
             scaffold_max_len = 98
         else:
             scaffold_max_len = 0
-
-        content = ' '.join(smiles + scaf)
-        chars = sorted(list(set(regex.findall(content))))
-
-        stoi = { ch:i for i,ch in enumerate(chars) }
         
+        #content = ' '.join(smiles + scaf)
+        #chars = sorted(list(set(regex.findall(content))))
+        #stoi = { ch:i for i,ch in enumerate(chars) }
+            
         if not os.path.exists(f'{args.data_name}_stoi.json'):
-            content = ' '.join(smiles + scaf)
-            chars = sorted(list(set(regex.findall(content))))
-
-            stoi = { ch:i for i,ch in enumerate(chars) }
+            whole_string = ['#', '%10', '%11', '%12', '(', ')', '-', '1', '2', '3', '4', '5', '6', '7', '8', '9', '<', '=', 'B', 'Br', 'C', 'Cl', 'F', 'I', 'N', 'O', 'P', 'S', '[B-]', '[BH-]', '[BH2-]', '[BH3-]', '[B]', '[C+]', '[C-]', '[CH+]', '[CH-]', '[CH2+]', '[CH2]', '[CH]', '[F+]', '[H]', '[I+]', '[IH2]', '[IH]', '[N+]', '[N-]', '[NH+]', '[NH-]', '[NH2+]', '[NH3+]', '[N]', '[O+]', '[O-]', '[OH+]', '[O]', '[P+]', '[PH+]', '[PH2+]', '[PH]', '[S+]', '[S-]', '[SH+]', '[SH]', '[Se+]', '[SeH+]', '[SeH]', '[Se]', '[Si-]', '[SiH-]', '[SiH2]', '[SiH]', '[Si]', '[b-]', '[bH-]', '[c+]', '[c-]', '[cH+]', '[cH-]', '[n+]', '[n-]', '[nH+]', '[nH]', '[o+]', '[s+]', '[sH+]', '[se+]', '[se]', 'b', 'c', 'n', 'o', 'p', 's']
+            stoi = { ch:i for i,ch in enumerate(whole_string) }
         
             with open(f'{args.data_name}_stoi.json', 'w') as f:
                  json.dump(stoi, f)
