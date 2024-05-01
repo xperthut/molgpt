@@ -73,7 +73,7 @@ class Trainer:
             print(f"Model does not have module")
         raw_model = self.model.module if hasattr(self.model, "module") else self.model
         logger.info("saving %s", self.config.ckpt_path)
-        print(f"State dictionary={raw_model.state_dict()}")
+        #print(f"State dictionary={raw_model.state_dict()}")
         torch.save(raw_model.state_dict(), self.config.ckpt_path)
 
     def train(self, wandb):
