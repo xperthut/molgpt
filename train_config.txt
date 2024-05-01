@@ -31,8 +31,46 @@ block_size=54
 generate=False
 Device=cuda
 
+---------------------------------------------------------------------
+For getter dataset:
+---------------------------------------------------------------------
+Namespace(run_name='unconditional_getter', debug=False, scaffold=False, lstm=False, data_name='unsat_CHO_SMILES_for_GPT', props=['qed'], num_props=0, n_layer=8, n_head=8, n_embd=256, max_epochs=10, batch_size=384, learning_rate=0.0006, lstm_layers=2, generate=False)
+# Train data= 1472973
+# Validation data= 75512
+Max len:  144
+Scaffold max len:  144
+data has 1472973 smiles, 94 unique characters.
+data has 75512 smiles, 94 unique characters.
+
+GPT configuration
+=====================
+vocab_size=94
+block_size=144
+num_props=0
+n_layer=8
+n_head=8
+n_embd=256
+scaffold=False
+scaffold_maxlen=144
+lstm=False
+lstm_layers=2
+
+Trainer configuration
+=========================
+max_epochs=10
+batch_size=384
+learning_rate=0.0006
+lr_decay=True
+warmup_tokens=21210811.200000003
+final_tokens=2121081120
+num_workers=10
+ckpt_path=../cond_gpt/weights/unconditional_getter.pt
+block_size=144
+generate=False
+Device=cuda
 
 command:
 ===========
-sbatch run_train_unconditional.slum unconditional_getter unsat_CHO_SMILES_for_GPT 74
+sbatch run_train_unconditional.slum unconditional_getter unsat_CHO_SMILES_for_GPT 384
 
+sbatch run_generate_unconditional.slum unconditional_getter generated_unconditional_getter unsat_CHO_SMILES_for_GPT 384 100 94 144

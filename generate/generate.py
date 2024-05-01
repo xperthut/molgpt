@@ -67,7 +67,10 @@ if __name__ == '__main__':
             scaf = data[data['split']!='test_scaffolds']['scaffold_smiles']   # needed for moses
         else:
             smiles = data[data['source']!='test']['smiles']
-            scaf = data[data['source']!='test']['scaffold_smiles']
+            if 'scaffold_smiles' in data.columns:
+                scaf = data[data['source']!='test']['scaffold_smiles']
+            else:
+                scaf = data[data['source']!='test']['smiles']
 
         # scaffold = data[data['split']!='test_scaffolds']['scaffold_smiles']
         # lens = [len(i.strip()) for i in scaffold.values]
@@ -97,6 +100,8 @@ if __name__ == '__main__':
             scaffold_max_len=48
         elif ('guacamol' in args.data_name) and args.scaffold:
             scaffold_max_len = 98
+        elif 'unsat_CHO' in args.data_name:
+            scaffold_max_len = 144
         else:
             scaffold_max_len = 0
         
