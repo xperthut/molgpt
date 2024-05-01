@@ -1,0 +1,38 @@
+Namespace(run_name='unconditional_moses', debug=False, scaffold=False, lstm=False, data_name='moses2', props=['qed'], num_props=0, n_layer=8, n_head=8, n_embd=256, max_epochs=10, batch_size=384, learning_rate=0.0006, lstm_layers=2, generate=False)
+Max len:  54
+Scaffold max len:  48
+data has 1584079 smiles, 94 unique characters.
+data has 175984 smiles, 94 unique characters.
+
+GPT configuration
+=======================
+vocab_size=94
+block_size=54
+num_props=0
+n_layer=8
+n_head=8
+n_embd=256
+scaffold=False
+scaffold_maxlen=48
+lstm=False
+lstm_layers=2
+
+Trainer configuration
+============================
+max_epochs=10
+batch_size=384
+learning_rate=0.0006
+lr_decay=True
+warmup_tokens=8554026.600000001
+final_tokens=855402660
+num_workers=10
+ckpt_path=../cond_gpt/weights/unconditional_moses.pt
+block_size=54
+generate=False
+Device=cuda
+
+
+command:
+===========
+sbatch run_train_unconditional.slum unconditional_getter unsat_CHO_SMILES_for_GPT 64
+
