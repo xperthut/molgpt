@@ -78,7 +78,7 @@ if __name__ == '__main__':
         train_data = data[data['source'] == 'train'].reset_index(
             drop=True)   # 'split' instead of 'source' in moses
 
-    train_data = train_data.sample(frac = 0.7, random_state = 42).reset_index(drop=True)
+    #train_data = train_data.sample(frac = 0.7, random_state = 42).reset_index(drop=True)
     
     print('# Train data=', train_data.shape[0])
 
