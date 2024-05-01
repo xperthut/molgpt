@@ -98,15 +98,15 @@ if __name__ == '__main__':
     vprop = val_data[args.props].values.tolist()
     num_props = args.num_props
 
-    if train_data['scaffold_smiles']:
-        scaffold = train_data['scaffold_smiles']
+    if 'scaffold_smiles' in train_data.columns:
+        scaffold = train_data['smiles']
     else:
         scaffold = smiles.copy()
         
-    if val_data['scaffold_smiles']:
+    if 'scaffold_smiles' in val_data.columns:
         vscaffold = val_data['scaffold_smiles']
     else:
-        vscaffold = vsmiles.copy()
+        vscaffold = val_data['smiles']
 
     pattern = "(\[[^\]]+]|<|Br?|Cl?|N|O|S|P|F|I|b|c|n|o|s|p|\(|\)|\.|=|#|-|\+|\\\\|\/|:|~|@|\?|>|\*|\$|\%[0-9]{2}|[0-9])"
     regex = re.compile(pattern)
