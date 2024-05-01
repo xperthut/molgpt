@@ -84,8 +84,9 @@ if __name__ == '__main__':
     else:
         val_data = data[data['source'] == 'val'].reset_index(
             drop=True)   # test for Moses. val for guacamol
-
-    # val_data = val_data.sample(frac = 0.1, random_state = 42).reset_index(drop=True)
+    
+    if len(val_data)==0:
+        val_data = val_data.sample(frac = 0.1, random_state = 42).reset_index(drop=True)
 
     smiles = train_data['smiles']
     vsmiles = val_data['smiles']
@@ -99,9 +100,9 @@ if __name__ == '__main__':
     num_props = args.num_props
 
     if 'scaffold_smiles' in train_data.columns:
-        scaffold = train_data['smiles']
+        scaffold = train_data['scaffold_smiles']
     else:
-        scaffold = smiles.copy()
+        scaffold = train_data['smiles']
         
     if 'scaffold_smiles' in val_data.columns:
         vscaffold = val_data['scaffold_smiles']
@@ -146,9 +147,9 @@ if __name__ == '__main__':
                       n_layer=args.n_layer, n_head=args.n_head, n_embd=args.n_embd, scaffold=args.scaffold,
                       scaffold_maxlen=scaffold_max_len, lstm=args.lstm, lstm_layers=args.lstm_layers)
     model = GPT(mconf)
-    print("*************************")
-    print(model)
-    print("*************************")
+    #print("*************************")
+    #print(model)
+    #print("*************************")
 
     tconf = TrainerConfig(max_epochs=args.max_epochs, batch_size=args.batch_size, 
                           learning_rate=args.learning_rate,
