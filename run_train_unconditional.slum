@@ -17,5 +17,6 @@ source activate Torch-CUDA-11
 
 echo $1
 echo $2
+echo $3
 
-python train/train.py --run_name $1 --data_name $2 --batch_size 384 --max_epochs 10 --num_props 0
+python train/train.py --run_name $1 --data_name $2 --batch_size $3 --max_epochs 10 --num_props 0
