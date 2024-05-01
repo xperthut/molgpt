@@ -156,7 +156,7 @@ class Trainer:
         molecules = []
 
         for epoch in range(config.max_epochs):
-
+            print(f"Epoch={epoch}")
             train_loss = run_epoch('train')
             if self.test_dataset is not None:
                 test_loss = run_epoch('test')
