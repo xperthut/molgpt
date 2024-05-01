@@ -79,6 +79,8 @@ if __name__ == '__main__':
             drop=True)   # 'split' instead of 'source' in moses
 
     train_data = train_data.sample(frac = 0.9, random_state = 42).reset_index(drop=True)
+    
+    print('Train data=', train_data.shape[0])
 
     if 'moses' in args.data_name:
         val_data = data[data['split'] == 'test'].reset_index(
@@ -87,8 +89,7 @@ if __name__ == '__main__':
         val_data = data[data['source'] == 'val'].reset_index(
             drop=True)   # test for Moses. val for guacamol
     
-    if len(val_data)==0:
-        val_data = val_data.sample(frac = 0.1, random_state = 42).reset_index(drop=True)
+    # val_data = val_data.sample(frac = 0.1, random_state = 42).reset_index(drop=True)
 
     smiles = train_data['smiles']
     vsmiles = val_data['smiles']
