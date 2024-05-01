@@ -34,5 +34,5 @@ Device=cuda
 
 command:
 ===========
-sbatch run_train_unconditional.slum unconditional_getter unsat_CHO_SMILES_for_GPT 64
+sbatch run_train_unconditional.slum unconditional_getter unsat_CHO_SMILES_for_GPT 74
 
