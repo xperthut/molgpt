@@ -15,9 +15,9 @@ source activate Torch-CUDA-11
 # 2=generated_unconditional_moses
 # 3=moses2
 # 4=384
-# 5=50
-# 6=94
-# 7=54
+# 5=94
+# 6=54
+# 7=50 number of smile string want to generate
 
 echo $1
 echo $2
@@ -27,4 +27,4 @@ echo $5
 echo $6
 echo $7
 
-python generate/generate.py --model_weight $1 --csv_name $2 --data_name $3 --batch_size $4 --gen_size $5 --vocab_size $6 --block_size $7
+python generate/generate.py --model_weight $1 --csv_name $2 --data_name $3 --batch_size $4 --vocab_size $5 --block_size $6 --gen_size $7
