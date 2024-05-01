@@ -17,6 +17,8 @@ from dataset import SmileDataset
 import math
 from utils import SmilesEnumerator
 import re
+#import os
+#os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:4096"
 
 
 if __name__ == '__main__':
@@ -76,7 +78,7 @@ if __name__ == '__main__':
         train_data = data[data['source'] == 'train'].reset_index(
             drop=True)   # 'split' instead of 'source' in moses
 
-    # train_data = train_data.sample(frac = 0.1, random_state = 42).reset_index(drop=True)
+    train_data = train_data.sample(frac = 0.9, random_state = 42).reset_index(drop=True)
 
     if 'moses' in args.data_name:
         val_data = data[data['split'] == 'test'].reset_index(
