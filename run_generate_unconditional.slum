@@ -11,6 +11,7 @@ source "$CONDA_BASE_DIR/etc/profile.d/conda.sh"
 
 source activate Torch-CUDA-11
 
+# For moses
 # 1=unconditional_moses
 # 2=generated_unconditional_moses
 # 3=moses2
@@ -18,6 +19,16 @@ source activate Torch-CUDA-11
 # 5=94
 # 6=54
 # 7=50 number of smile string want to generate
+
+# For getter
+# 1=unconditional_getter
+# 2=generated_unconditional_getter
+# 3=unsat_CHO_SMILES_for_GPT
+# 4=384
+# 5=94
+# 6=144
+# 7=1000
+# sbatch run_generate_unconditional.slum 'unconditional_getter' 'generated_unconditional_getter_May_20_2024' 'unsat_CHO_SMILES_for_GPT' 384 94 144 10000
 
 echo $1
 echo $2
