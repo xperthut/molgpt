@@ -205,6 +205,9 @@ if __name__ == '__main__':
                         # for c in [40.0, 80.0, 120.0]:
         
         count = 0
+        print(f"prop_condition={prop_condition}")
+        print(f"scaf_condition={scaf_condition}")
+    
         if prop_condition is None and scaf_condition is None:
             molecules = []
             count += 1
